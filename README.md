@@ -321,3 +321,301 @@ That's it. The rest is details.
   
   Please don't use all these forms to impress colleagues, but be prepared that you can encounter them in someone's code. 
 
+### How do you use v-for directive with a range?
+     You can also use integer type(say 'n') for `v-for` directive which repeats the element many times.
+     ```javascript
+     <div>
+       <span v-for="n in 20">{{ n }} </span>
+     </div>
+     ```
+     It displays the number 1 to 20.
+     
+### How do you use v-for directive on template?
+
+Just similar to v-if directive on template, you can also use a `<template>` tag with v-for directive to render a block of multiple elements.
+
+     Let's take a todo example,
+     ```javascript
+     <ul>
+       <template v-for="todo in todos">
+         <li>{{ todo.title }}</li>
+         <li class="divider"></li>
+       </template>
+     </ul>
+     ```
+
+### How do you use event handlers?
+
+You can use event handlers in vue similar to plain javascript. The method calls also support the special $event variable.
+     ```javascript
+     <button v-on:click="show('Welcome to VueJS world', $event)">
+       Submit
+     </button>
+
+     methods: {
+       show: function (message, event) {
+         // now we have access to the native event
+         if (event) event.preventDefault()
+         console.log(message);
+       }
+     }
+     ```
+
+### What are the event modifiers provided by vue?
+
+Normally, javascript provides `event.preventDefault() or event.stopPropagation()` inside event handlers. You can use methods provided by vue, but these methods are meant for data logic instead of dealing with DOM events. Vue provides below event modifiers for v-on and these modifiers are directive postfixes denoted by a dot.
+     1. .stop
+     2. .prevent
+     3. .capture
+     4. .self
+     5. .once
+     6. .passive
+     
+     Let's take an example of stop modifier,
+     ```html
+     <!-- the click event's propagation will be stopped -->
+     <a v-on:click.stop="methodCall"></a>
+     ```
+     You can also chain modifiers as below,
+     ```html
+     <!-- modifiers can be chained -->
+     <a v-on:click.stop.prevent="doThat"></a>
+     ```
+
+### What are key modifiers?
+     
+Vue supports key modifiers on `v-on` for handling keyboard events. Let's take an example of keyup event with enter keycode.
+     ```html
+     <!-- only call `vm.show()` when the `keyCode` is 13 -->
+     <input v-on:keyup.13="show">
+     ```
+     Remembering all the key codes is really difficult. It supports the full list of key codes aliases
+     1. .enter
+     2. .tab
+     3. .delete (captures both “Delete” and “Backspace” keys)
+     4. .esc
+     5. .space
+     6. .up
+     7. .down
+     8. .left
+     9. .right
+
+     Now the above keyup code snippet can be written with aliases as follows,
+     ```vue
+     <input v-on:keyup.enter="submit" />
+     <!-- OR with shorthand notation -->
+     <input @keyup.enter="submit" />
+     ```
+
+     **Note:** The use of keyCode events is deprecated and may not be supported in new browsers.
+
+
+### How do you define custom key modifier aliases?
+
+You can define custom key modifier aliases via the global `config.keyCodes`. There are few guidelines for the properties
+     1. You can't use camelCase. Instead you can use kebab-case with double quotation marks
+     2. You can define multiple values in an array format
+     ```javascript
+     Vue.config.keyCodes = {
+       f1: 112,
+       "media-play-pause": 179,
+       down: [40, 87]
+     }
+     ```
+
+### What are the supported System Modifier Keys?
+
+Vue supports below modifiers to trigger mouse or keyboard event listeners when the corresponding key is pressed,
+     1. .ctrl
+     2. .alt
+     3. .shift
+     4. .meta
+
+     Lets take an example of control modifier with click event,
+     ```vue
+     <!-- Ctrl + Click -->
+     <div @click.ctrl="doSomething">Do something</div>
+     ```
+
+### What are the supported Mouse Button Modifiers?
+
+Vue supports below mouse button modifiers
+     1. .left
+     2. .right
+     3. .middle
+
+     For example, the usage of `.right` modifier as below
+     ```vue
+      <button
+        v-if="button === 'right'"
+        v-on:mousedown.right="increment"
+        v-on:mousedown.left="decrement"
+      />
+     ```
+
+### How do you implement two-way binding?
+
+You can use the `v-model` directive to create two-way data bindings on form input, textarea, and select elements.
+
+     Lets take an example of it using input component,
+     ```vue
+     <input v-model="message" placeholder="Enter input here">
+     <p>The message is: {{ message }}</p>
+     ```
+     Remember, v-model will ignore the initial `value`, `checked` or `selected` attributes found on any form elements. So it always use the Vue instance data as the source of truth.
+
+
+### What are the supported modifiers on model?
+
+There are three modifiers supported for v-model directive.
+
+     **1. lazy:** By default, v-model syncs the input with the data after each input event. You can add the lazy modifier to instead sync after change events.
+     ```vue
+     <!-- synced after "change" instead of "input" -->
+     <input v-model.lazy="msg" >
+     ```
+     **2. number:** If you want user input to be automatically typecast as a number, you can add the number modifier to your v-model. Even with type="number", the value of HTML input elements always returns a string. So, this typecast modifier is required.
+     ```vue
+     <input v-model.number="age" type="number">
+     ```
+     **3. trim:** If you want whitespace from user input to be trimmed automatically, you can add the trim modifier to your v-model.
+     ```vue
+     <input v-model.trim="msg">
+     ```
+
+### What are components and give an example?
+     
+Components are reusable Vue instances with a name. They accept the same options as new Vue, such as data, computed, watch, methods, and lifecycle hooks(except few root-specific options like el).
+
+     Lets take an example of counter component,
+     ```javascript
+     // Define a new component called button-counter
+     Vue.component('button-counter', {
+       template: '<button v-on:click="count++">You clicked me {{ count }} times.</button>'
+       data: function () {
+         return {
+           count: 0
+         }
+       },
+     })
+     ```
+     Let's use this component inside a root Vue instance created with new Vue
+     ```javascript
+     <div id="app">
+       <button-counter></button-counter>
+     </div>
+
+     var vm = new Vue({ el: '#app' });
+     ```
+
+### What are props?
+
+Props are custom attributes you can register on a component. When a value is passed to a prop attribute, it becomes a property on that component instance. You can pass those list of values as props option and use them as similar to data variables in template.
+     ```javascript
+     Vue.component('todo-item', {
+       props: ['title'],
+       template: '<h2>{{ title }}</h2>'
+     })
+     ```
+     Once the props are registered, you can pass them as custom attributes.
+     ```vue
+     <todo-item title="Learn Vue conceptsnfirst"></todo-item>
+     ```
+
+### When component needs a single root element?
+
+In VueJS 2.x, every component must have a single root element **when template has more than one element**. In this case, you need to wrap the elements with a parent element.
+     ```vue
+     <template>
+        <div class="todo-item">
+            <h2>{{ title }}</h2>
+            <div v-html="content"></div>
+        </div>
+     </template>
+     ```
+     Otherwise there will an error throwing, saying that "Component template should contain exactly one root element...".
+
+     Whereas in 3.x, components now can have multiple root nodes. This way of adding multiple root nodes is called as fragments.
+     ```vue
+     <template>
+          <h2>{{ title }}</h2>
+          <div v-html="content"></div>
+     </template>
+     ```
+
+### How do you communicate from child to parent using events?
+
+If you want child wants to communicate back up to the parent, then emit an event from child using `$emit` object to parent,
+     ```javascript
+     Vue.component('todo-item', {
+       props: ['todo'],
+       template: `
+         <div class="todo-item">
+           <h3>{{ todo.title }}</h3>
+           <button v-on:click="$emit('increment-count', 1)">
+             Add
+           </button>
+           <div v-html="todo.description"></div>
+         </div>
+       `
+     })
+     ```
+     Now you can use this todo-item in parent component to access the count value.
+     ```vue
+     <ul v-for="todo in todos">
+       <li>
+         <todo-item
+           v-bind:key="todo.id"
+           v-bind:todo="todo"
+           v-on:increment-count="total += 1"
+         /></todo-item>
+       </li>
+     </ul>
+     <span> Total todos count is {{total}}</span>
+     ```
+
+### How do you implement model on custom input components?
+
+The custom events can also be used to create custom inputs that work with v-model. The `<input>` inside the component must follow below rules,
+
+     1. Bind the value attribute to a value prop
+     2. On input, emit its own custom input event with the new value.
+
+     Let's take a custom-input component as an example,
+        ```javascript
+        Vue.component('custom-input', {
+          props: ['value'],
+          template: `
+            <input
+              v-bind:value="value"
+              v-on:input="$emit('input', $event.target.value)"
+            />
+          `
+        })
+        ```
+     Now you can use `v-model` with this component,
+      ```vue
+      <custom-input v-model="searchInput"></custom-input>
+      ```
+
+### What are slots?
+
+Vue implements a content distribution API using the <slot> element to serve as distribution outlets for content created after the current Web Components spec draft.
+
+     Let's create an alert component with slots for content insertion,
+     ```javascript
+     Vue.component('alert', {
+       template: `
+         <div class="alert-box">
+           <strong>Error!</strong>
+           <slot></slot>
+         </div>
+       `
+     })
+     ```
+     Now you can insert dynamic content as below,
+     ```vue
+     <alert>
+       There is an issue with in application.
+     </alert>
+     ```
